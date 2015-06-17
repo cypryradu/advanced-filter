@@ -1,0 +1,22 @@
+{
+    "name": "cypryradu/advanced-filter",
+    "description": "This component allows you generate complex queries with JOINs WHERE, GROUP BY, ORDER, HAVING on the fly, based on an array you can receive via an interface",
+    "require": {
+        "doctrine/dbal": "2.*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "4.6.6"  
+    },
+    "autoload": {
+        "psr-4": {
+            "CypryRadu\\AdvancedFilter\\": "src/"
+        }
+    },          
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Ciprian Radu",
+            "email": "cypryradu@gmail.com"
+        }
+    ]
+}
