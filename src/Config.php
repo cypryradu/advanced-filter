@@ -13,6 +13,7 @@ class Config {
     {
         return array(
             'mv.marketing__volunteers' => array(),
+            'l.log' => array('leftJoin', 'l.id = mv.log_id'),
             'ro.recruitment_offices' => array('leftJoin', 'ro.id = mv.recruitment_office_id'),
             'mvdr.marketing__volunteers_destinations_rel' => array('leftJoin', 'mvdr.vol_id = mv.id'),
             'mvpr.marketing__volunteers_projects_rel' => array(
@@ -44,6 +45,16 @@ class Config {
                     'mv.marketing__volunteers',
                     'ro.recruitment_offices'
                 )
+            ),
+            'application_date' => array(
+                'table_alias' => 'l',
+                'db_field' => 'date_created',
+                'type' => 'date',
+                'operators' => array('>=', '<=', 'LIKE', 'NOT LIKE'),
+                'use_tables' => array(
+                    'mv.marketing__volunteers',
+                    'l.log'
+                )
             )
         );
     }
@@ -53,7 +64,7 @@ class Config {
         return array(
             'recruitment_office' => function() {
                 $stmt = $this->db->prepare(
-                    'SELECT * 
+                    'SELECT id, recruitment_office
                      FROM recruitment_offices 
                      ORDER BY recruitment_office'
                 );

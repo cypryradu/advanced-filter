@@ -11,29 +11,52 @@ class Filter
     private $criteria;
     private $builder;
     private $usedTables = array();
-    
-    public function __construct(QueryBuilder $builder, Config $config, Criteria $criteria)
+
+    public function __construct(QueryBuilder $builder, Config $config)
     {
         $this->builder = $builder;
         $this->config = $config;
-        $this->criteria = $criteria;
+
+        $this->criteria = new Criteria();
     }
-    
+
+    public function addWhere(Criterion $criterion)
+    {
+        $this->criteria->add(
+            $criterion->setType('where')
+        );
+    }
+
+    public function addGroupBy(Criterion $criterion)
+    {
+        $this->criteria->add(
+            $criterion->setType('group by')
+        );
+    }
+
+    public function addHaving(Criterion $criterion)
+    {
+        $this->criteria->add(
+            $criterion->setType('having')
+        );
+    }
+
+
     public function addUsedTable($table)
     {
         $this->usedTables[$table->getKey()] = $table;
     }
-    
+
     public function isTableUsed($tableKey)
     {
         return isset($this->usedTables[$tableKey]);
     }
-    
+
     public function getUsedTables()
     {
         return $this->usedTables;
     }
-    
+
     public function getFieldMetaByName($fieldName)
     {
         $fields = $this->config->fields();
@@ -42,13 +65,13 @@ class Filter
         }
         return $fields[$fieldName];
     }
-    
+
     public function getField($fieldKey)
     {
         $fieldMeta = $this->getFieldMetaByName($fieldKey);
         return new Field($fieldKey, $fieldMeta);
     }
-    
+
     public function getTableMetaByName($tableKey)
     {
         $tables = $this->config->tables();
@@ -57,14 +80,14 @@ class Filter
         }
         return $tables[$tableKey];
     }
-    
+
     public function getTable($tableKey)
     {
         $tableMeta = $this->getTableMetaByName($tableKey);
         return new Table($tableKey, $tableMeta);
     }
-    
-    
+
+
     public function getFromTable()
     {
         $tables = $this->config->tables();
@@ -73,19 +96,19 @@ class Filter
         $tableMeta = $this->getTableMetaByName($tableKey);
         return new Table($tableKey, $tableMeta);
     }
-    
+
     public function build()
     {
         foreach ($this->criteria->getAll() as $criterion) {
             $criterion->build($this, $this->builder, $this->config);
         }
-        
+
         return $this->builder;
     }
-    
+
     public function __toString()
     {
         return $this->getSql();
     }
-    
+
 }

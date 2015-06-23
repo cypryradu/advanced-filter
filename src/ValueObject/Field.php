@@ -87,4 +87,15 @@ class Field
     {
         return $this->getTableAlias() . '`' . $this->getDbField() . '`';
     }
+
+    /**
+     * Gets the field's table type
+     *
+     * @return string
+     */
+    public function getFieldType()
+    {
+        return (!empty($this->metaData['type']) ? $this->metaData['type'] : '');
+    }
+
 }

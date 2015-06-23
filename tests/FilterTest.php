@@ -24,30 +24,27 @@ class FilterTest extends PHPUnit_Framework_TestCase
         );
         $this->db = DriverManager::getConnection($connectionParams, $config);
     }
-    
-    
+
+
     /**
      * @expectedException InvalidArgumentException
      */
     public function testExceptionWhenNotFieldNotDefined()
     {
         $queryBuilder = $this->db->createQueryBuilder();
-        
+
         $filterConfig = new Config();
-        $criteria = new Criteria();
-        $criterion = new Criterion(array(
+
+        $advancedFilter = new Filter($queryBuilder, $filterConfig);
+        $advancedFilter->addWhere(new Criterion(array(
             'field' => 'volunteer_firstname', // this is not defined
             'operator' => '=',
             'value' => 'Ciprian',
             'link' => ''
-        ));
-        
-        $criteria->add($criterion);
-        
-        $advancedFilter = new Filter($queryBuilder, $filterConfig, $criteria);
+        )));
         $builder = $advancedFilter->build();
     }
-    
+
     public function testWhenThereIsNoJoinAndASingleFieldWithNoDbFieldDefined()
     {
         $testQueryBuilder = $this->db->createQueryBuilder();
@@ -56,25 +53,21 @@ class FilterTest extends PHPUnit_Framework_TestCase
             ->where('mv.`firstname` = ' . $testQueryBuilder->createPositionalParameter('Ciprian'))
         ;
         $queryBuilder = $this->db->createQueryBuilder();
-        
+
         $filterConfig = new Config();
-        $criteria = new Criteria();
-        $criterion = new Criterion(array(
+
+        $advancedFilter = new Filter($queryBuilder, $filterConfig);
+        $advancedFilter->addWhere(new Criterion(array(
             'open_parens' => array(0, 0),
             'closed_parens' => array(0, 0),
             'field' => 'firstname',
             'operator' => '=',
             'value' => 'Ciprian',
-            'link' => ''
-        ));
-        
-        $criteria->add($criterion);
-        
-        $advancedFilter = new Filter($queryBuilder, $filterConfig, $criteria);
+        )));
         $queryBuilder = $advancedFilter->build();
         $this->assertEquals($testQueryBuilder,$queryBuilder);
     }
-    
+
     public function testWhenThereIsNoJoinAndASingleFieldWithDbFieldDefined()
     {
         $testQueryBuilder = $this->db->createQueryBuilder();
@@ -83,25 +76,21 @@ class FilterTest extends PHPUnit_Framework_TestCase
             ->where('mv.`surname` = ' . $testQueryBuilder->createPositionalParameter('Radu'))
         ;
         $queryBuilder = $this->db->createQueryBuilder();
-        
+
         $filterConfig = new Config();
-        $criteria = new Criteria();
-        $criterion = new Criterion(array(
+
+        $advancedFilter = new Filter($queryBuilder, $filterConfig);
+        $advancedFilter->addWhere(new Criterion(array(
             'open_parens' => array(0, 0),
             'closed_parens' => array(0, 0),
             'field' => 'volunteer_surname',
             'operator' => '=',
             'value' => 'Radu',
-            'link' => ''
-        ));
-        
-        $criteria->add($criterion);
-        
-        $advancedFilter = new Filter($queryBuilder, $filterConfig, $criteria);
+        )));
         $queryBuilder = $advancedFilter->build();
         $this->assertEquals($testQueryBuilder,$queryBuilder);
     }
-    
+
     public function testWhenThereIsNoJoinAndASingleFieldWithParens()
     {
         $testQueryBuilder = $this->db->createQueryBuilder();
@@ -110,25 +99,21 @@ class FilterTest extends PHPUnit_Framework_TestCase
             ->where('(mv.`firstname` = ' . $testQueryBuilder->createPositionalParameter('Ciprian') . ')')
         ;
         $queryBuilder = $this->db->createQueryBuilder();
-        
+
         $filterConfig = new Config();
-        $criteria = new Criteria();
-        $criterion = new Criterion(array(
+
+        $advancedFilter = new Filter($queryBuilder, $filterConfig);
+        $advancedFilter->addWhere(new Criterion(array(
             'open_parens' => array(0, 1),
             'closed_parens' => array(1, 0),
             'field' => 'firstname',
             'operator' => '=',
             'value' => 'Ciprian',
-            'link' => ''
-        ));
-        
-        $criteria->add($criterion);
-        
-        $advancedFilter = new Filter($queryBuilder, $filterConfig, $criteria);
+        )));
         $queryBuilder = $advancedFilter->build();
         $this->assertEquals($testQueryBuilder,$queryBuilder);
     }
-    
+
     public function testWhenThereIsNoJoinAndMoreFields()
     {
         $testQueryBuilder = $this->db->createQueryBuilder();
@@ -138,31 +123,25 @@ class FilterTest extends PHPUnit_Framework_TestCase
             ->andWhere('mv.`surname` = ' . $testQueryBuilder->createPositionalParameter('Radu'))
         ;
         $queryBuilder = $this->db->createQueryBuilder();
-        
+
         $filterConfig = new Config();
-        $criteria = new Criteria();
-        $criterion1 = new Criterion(array(
+
+        $advancedFilter = new Filter($queryBuilder, $filterConfig);
+        $advancedFilter->addWhere(new Criterion(array(
             'field' => 'firstname',
             'operator' => '=',
             'value' => 'Ciprian',
-            'link' => ''
-        ));
-        
-        $criterion2 = new Criterion(array(
+        )));
+        $advancedFilter->addWhere(new Criterion(array(
             'field' => 'volunteer_surname',
             'operator' => '=',
             'value' => 'Radu',
             'link' => 'AND'
-        ));
-        
-        $criteria->add($criterion1);
-        $criteria->add($criterion2);
-        
-        $advancedFilter = new Filter($queryBuilder, $filterConfig, $criteria);
+        )));
         $queryBuilder = $advancedFilter->build();
         $this->assertEquals($testQueryBuilder, $queryBuilder);
     }
-    
+
     public function testWhenThereIsNoJoinAndMoreFieldsWithParens()
     {
         $testQueryBuilder = $this->db->createQueryBuilder();
@@ -172,35 +151,29 @@ class FilterTest extends PHPUnit_Framework_TestCase
             ->orWhere('mv.`surname` = ' . $testQueryBuilder->createPositionalParameter('Radu') . ')')
         ;
         $queryBuilder = $this->db->createQueryBuilder();
-        
+
         $filterConfig = new Config();
-        $criteria = new Criteria();
-        $criterion1 = new Criterion(array(
+
+        $advancedFilter = new Filter($queryBuilder, $filterConfig);
+        $advancedFilter->addWhere(new Criterion(array(
             'open_parens' => array(0,1),
             'closed_parens' => array(0,0),
             'field' => 'firstname',
             'operator' => '=',
             'value' => 'Ciprian',
-            'link' => ''
-        ));
-        
-        $criterion2 = new Criterion(array(
+        )));
+        $advancedFilter->addWhere(new Criterion(array(
             'open_parens' => array(0,0),
             'closed_parens' => array(1,0),
             'field' => 'volunteer_surname',
             'operator' => '=',
             'value' => 'Radu',
             'link' => 'OR'
-        ));
-        
-        $criteria->add($criterion1);
-        $criteria->add($criterion2);
-        
-        $advancedFilter = new Filter($queryBuilder, $filterConfig, $criteria);
+        )));
         $queryBuilder = $advancedFilter->build();
         $this->assertEquals($testQueryBuilder, $queryBuilder);
     }
-    
+
     public function testOneJoinAndASingleField()
     {
         $testQueryBuilder = $this->db->createQueryBuilder();
@@ -210,32 +183,47 @@ class FilterTest extends PHPUnit_Framework_TestCase
             ->where('ro.`recruitment_office` = ' . $testQueryBuilder->createPositionalParameter('France'))
         ;
         $queryBuilder = $this->db->createQueryBuilder();
-        
+
         $filterConfig = new Config($this->db);
-        $criteria = new Criteria();
-        $criterion = new Criterion(array(
+
+        $advancedFilter = new Filter($queryBuilder, $filterConfig);
+        $advancedFilter->addWhere(new Criterion(array(
             'field' => 'recruitment_office',
             'operator' => '=',
             'value' => 'France',
-        ));
-        
-        $criteria->add($criterion);
-        
-        $advancedFilter = new Filter($queryBuilder, $filterConfig, $criteria);
+        )));
         $queryBuilder = $advancedFilter->build();
         $this->assertEquals($testQueryBuilder, $queryBuilder);
     }
-    
-/*
-    public function testFieldsCallback()
+
+    public function testWithDateField()
     {
         $filterConfig = new Config($this->db);
-        
-        $callbacks = $filterConfig->fieldsCallback();
-        $data = $callbacks['recruitment_office']();
-        
-        print_r($data); die;
+
+        $testQueryBuilder = $this->db->createQueryBuilder();
+        $testQueryBuilder->select('*')
+            ->from('marketing__volunteers', 'mv') 
+            ->leftJoin('mv', 'log', 'l', 'l.id = mv.log_id') 
+            ->where('l.`date_created` >= ' . $testQueryBuilder->createPositionalParameter('2013-02-01'))
+            ->andWhere('l.`date_created` < ' . $testQueryBuilder->createPositionalParameter('2013-02-21'))
+        ;
+        $queryBuilder = $this->db->createQueryBuilder();
+
+        $filterConfig = new Config($this->db);
+
+        $advancedFilter = new Filter($queryBuilder, $filterConfig);
+        $advancedFilter->addWhere(new Criterion(array(
+            'field' => 'application_date',
+            'operator' => '>=',
+            'value' => '2013-02-01',
+        )));
+        $advancedFilter->addWhere(new Criterion(array(
+            'field' => 'application_date',
+            'operator' => '<=',
+            'value' => '2013-02-20',
+            'link' => 'AND',
+        )));
+        $queryBuilder = $advancedFilter->build();
+        $this->assertEquals($testQueryBuilder, $queryBuilder);
     }
-*/
-    
 }
