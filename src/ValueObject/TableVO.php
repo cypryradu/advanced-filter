@@ -8,7 +8,7 @@ namespace CypryRadu\AdvancedFilter\ValueObject;
 *
 * @author Ciprian Radu <cypryradu@gmail.com>
 */
-class Table 
+class TableVO
 {
     /**
      * @var string

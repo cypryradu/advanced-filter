@@ -6,7 +6,7 @@ namespace CypryRadu\AdvancedFilter\ValueObject;
 *
 * @author Ciprian Radu <cypryradu@gmail.com>
 */
-class Field 
+class FieldVO
 {
     /**
      * @var string

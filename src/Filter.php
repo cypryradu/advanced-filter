@@ -2,8 +2,10 @@
 namespace CypryRadu\AdvancedFilter;
 
 use Doctrine\DBAL\Query\QueryBuilder;
-use CypryRadu\AdvancedFilter\ValueObject\Table;
-use CypryRadu\AdvancedFilter\ValueObject\Field;
+use CypryRadu\AdvancedFilter\ValueObject\TableVO;
+use CypryRadu\AdvancedFilter\ValueObject\FieldVO;
+use CypryRadu\AdvancedFilter\FieldCollection;
+use CypryRadu\AdvancedFilter\TableCollection;
 
 class Filter
 {
@@ -42,66 +44,42 @@ class Filter
     }
 
 
-    public function addUsedTable($table)
+    private function getTableCollection()
     {
-        $this->usedTables[$table->getKey()] = $table;
+        $tables = $this->config->tables();
+        $collection = new TableCollection();
+
+        foreach ($tables as $tableKey => $tableMeta) {
+            $collection->add(new TableVO($tableKey, $tableMeta));            
+        }
+        
+        return $collection;
     }
 
-    public function isTableUsed($tableKey)
-    {
-        return isset($this->usedTables[$tableKey]);
-    }
-
-    public function getUsedTables()
-    {
-        return $this->usedTables;
-    }
-
-    public function getFieldMetaByName($fieldName)
+    private function getFieldCollection()
     {
         $fields = $this->config->fields();
-        if (!isset($fields[$fieldName])) {
-            throw new \InvalidArgumentException('There is no field defined as "' . $fieldName . '"');
+        $collection = new FieldCollection();
+
+        foreach ($fields as $fieldKey => $fieldMeta) {
+            $collection->add(new FieldVO($fieldKey, $fieldMeta));            
         }
-        return $fields[$fieldName];
-    }
-
-    public function getField($fieldKey)
-    {
-        $fieldMeta = $this->getFieldMetaByName($fieldKey);
-        return new Field($fieldKey, $fieldMeta);
-    }
-
-    public function getTableMetaByName($tableKey)
-    {
-        $tables = $this->config->tables();
-        if (!isset($tables[$tableKey])) {
-            throw new \InvalidArgumentException('There is no table defined as "' . $tableKey . '"');
-        }
-        return $tables[$tableKey];
-    }
-
-    public function getTable($tableKey)
-    {
-        $tableMeta = $this->getTableMetaByName($tableKey);
-        return new Table($tableKey, $tableMeta);
-    }
-
-
-    public function getFromTable()
-    {
-        $tables = $this->config->tables();
-        reset($tables);
-        $tableKey = key($tables);
-        $tableMeta = $this->getTableMetaByName($tableKey);
-        return new Table($tableKey, $tableMeta);
+        
+        return $collection;
     }
 
     public function build()
     {
-        foreach ($this->criteria->getAll() as $criterion) {
-            $criterion->build($this, $this->builder, $this->config);
-        }
+	$tables = $this->getTableCollection();
+        $usedTables = new TableCollection();
+        $fields = $this->getFieldCollection();
+
+	$this->criteria->build(
+	    $this->builder, 
+	    $tables, 
+	    $usedTables,
+            $fields
+	);
 
         return $this->builder;
     }

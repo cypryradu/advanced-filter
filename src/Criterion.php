@@ -2,11 +2,13 @@
 namespace CypryRadu\AdvancedFilter;
 
 use CypryRadu\AdvancedFilter\ValueObject\DateVO;
+use CypryRadu\AdvancedFilter\ValueObject\FieldVO;
+use CypryRadu\AdvancedFilter\ValueObject\TableVO;
 
 class Criterion
 {
     private $type = 'where';
-    private $field;
+    private $fieldName;
     private $openParens = array();
     private $closedParens = array();
     private $link = 'AND';
@@ -16,7 +18,7 @@ class Criterion
     public function __construct($data = array())
     {
         if (!empty($data['field']))
-            $this->field = $data['field'];
+            $this->fieldName = $data['field'];
 
         if (!empty($data['open_parens']))
             $this->openParens = $data['open_parens'];
@@ -40,7 +42,7 @@ class Criterion
 
         return $this;
     }
-
+    
     private function calculateNumberOfParens(&$parens)
     {
         $count = 0;
@@ -56,18 +58,16 @@ class Criterion
     /*
     * Add the FROM clause
     */
-    private function buildFrom($filter, $builder)
+    private function buildFrom($builder, TableVO $fromTable, TableCollection $tablesUsed)
     {
-        $fromTable = $filter->getFromTable();
-
         // set the FROM clause
         $doesBuildFrom = false;
         $fromTableName = $fromTable->getName();
         $fromTableAlias = $fromTable->getAlias();
 
-        if (!$filter->getUsedTables()) {
+        if (!$tablesUsed->count()) {
             $builder->from($fromTableName, $fromTableAlias);
-            $filter->addUsedTable($fromTable);
+            $tablesUsed->add($fromTable);
             $doesBuildFrom = true;
         }
 
@@ -82,19 +82,20 @@ class Criterion
     /*
     * Add the necessary joins for this field
     */
-    private function buildJoins($filter, $builder, $field)
+    private function buildJoins($builder, FieldVO $field, TableCollection $tables, TableCollection $tablesUsed)
     {
-        $tablesUsed = count($filter->getUsedTables());
+        $tablesUsedCount = $tablesUsed->count();
+        $fromTable = $tables->first();
 
         $prevTableAlias = '';
         foreach ($field->getUseTables() as $tableKey) {
-            if (!$filter->isTableUsed($tableKey)) {
+            if (!$tablesUsed->get($tableKey)) {
 
                 if (empty($prevTableAlias)) {
-                    $prevTableAlias = $filter->getFromTable()->getAlias();
+                    $prevTableAlias = $fromTable->getAlias();
                 }
 
-                $table = $filter->getTable($tableKey);
+                $table = $tables->get($tableKey);
 
                 $tableName = $table->getName();
                 $tableAlias = $table->getAlias();
@@ -103,14 +104,14 @@ class Criterion
 
                 $builder->$joinType($prevTableAlias, $tableName, $tableAlias, $joinOn);
 
-                $filter->addUsedTable($table);
-                $tablesUsed++;
+                $tablesUsed->add($table);
+                $tablesUsedCount++;
 
                 $prevTableAlias = $tableAlias;
             }
         }
 
-        return $tablesUsed;
+        return $tablesUsedCount;
     }
 
     private function buildWhere($builder, $field)
@@ -140,20 +141,28 @@ class Criterion
                         }
                     break;
             }
-            $builder->$whereMethod($openParens . $fieldName . ' ' . $operator . ' ' . $builder->createPositionalParameter($fieldValue) . $closedParens);
+
+            call_user_func(
+                array($builder, $whereMethod),
+                $openParens . $fieldName . ' ' . $operator . ' ' . $builder->createPositionalParameter($fieldValue) . $closedParens
+            );
         }
     }
 
-    public function build($filter, $builder, $config)
+    public function build($builder, TableCollection $tables, TableCollection $tablesUsed, FieldCollection $fields)
     {
-        $field = $filter->getField($this->field);
+        $fromTable = $tables->first();
+        $field = $fields->get($this->fieldName);
 
-        $doesBuildFrom = $this->buildFrom($filter, $builder);
+        if (!$field) {
+            throw new \InvalidArgumentException('There is no field defined as "' . $this->fieldName . '"');
+        }
+
+        $doesBuildFrom = $this->buildFrom($builder, $fromTable, $tablesUsed);
         if ($doesBuildFrom) {
             $this->buildSelect($builder);
         }
-        $this->buildJoins($filter, $builder, $field);
+        $this->buildJoins($builder, $field, $tables, $tablesUsed);
         $this->buildWhere($builder, $field);
-
     }
 }
