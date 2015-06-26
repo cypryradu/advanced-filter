@@ -1,13 +1,14 @@
 <?php
+
 namespace CypryRadu\AdvancedFilter\ValueObject;
 
 /**
-* Encapsulates the data for a single table
-*
-* This class is immutable
-*
-* @author Ciprian Radu <cypryradu@gmail.com>
-*/
+ * Encapsulates the data for a single table.
+ *
+ * This class is immutable
+ *
+ * @author Ciprian Radu <cypryradu@gmail.com>
+ */
 class TableVO
 {
     /**
@@ -39,15 +40,14 @@ class TableVO
      * @var string
      */
     private $joinOn;
-    
+
     /**
-     * Constructor
+     * Constructor.
      *
      * @param string $tableKey
-     * @param array $metaData
-     *
+     * @param array  $metaData
      */
-    public function __construct($tableKey, $metaData)
+    public function __construct($tableKey, array $metaData)
     {
         list($tableName, $tableAlias) = array_reverse(explode('.', $tableKey));
 
@@ -58,9 +58,9 @@ class TableVO
         $this->joinType = array_shift($metaData);
         $this->joinOn = array_shift($metaData);
     }
-    
+
     /**
-     * Gets the tables's key
+     * Gets the tables's key.
      *
      * @return string
      */
@@ -68,9 +68,9 @@ class TableVO
     {
         return $this->tableKey;
     }
-    
+
     /**
-     * Gets the tables's name
+     * Gets the tables's name.
      *
      * @return string
      */
@@ -78,9 +78,9 @@ class TableVO
     {
         return $this->tableName;
     }
-    
+
     /**
-     * Gets the tables's alias
+     * Gets the tables's alias.
      *
      * @return string
      */
@@ -88,9 +88,9 @@ class TableVO
     {
         return $this->tableAlias;
     }
-    
+
     /**
-     * Gets the tables's join type with the other tables
+     * Gets the tables's join type with the other tables.
      *
      * @return string
      */
@@ -98,9 +98,9 @@ class TableVO
     {
         return $this->joinType;
     }
-    
+
     /**
-     * Gets the tables's join ON condition
+     * Gets the tables's join ON condition.
      *
      * @return string
      */
