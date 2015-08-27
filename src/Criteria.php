@@ -2,7 +2,7 @@
 
 namespace CypryRadu\AdvancedFilter;
 
-use Doctrine\DBAL\Query\QueryBuilder;
+use CypryRadu\AdvancedFilter\QueryBuilder\QueryBuilderInterface;
 
 /**
  * The class that holds all the individual Criterion(s)
@@ -30,13 +30,13 @@ class Criteria
     /**
      * Propagates the build call to each individual Criterion(s).
      *
-     * @param \Doctrine\DBAL\Query\QueryBuilder         $builder
-     * @param \CypryRadu\AdvancedFilter\TableCollection $tables
-     * @param \CypryRadu\AdvancedFilter\TableCollection $usedTables
-     * @param \CypryRadu\AdvancedFilter\FieldCollection $fields
+     * @param \CypryRadu\AdvancedFilter\QueryBuilder\QueryBuilderInterface $builder
+     * @param \CypryRadu\AdvancedFilter\TableCollection                    $tables
+     * @param \CypryRadu\AdvancedFilter\TableCollection                    $usedTables
+     * @param \CypryRadu\AdvancedFilter\FieldCollection                    $fields
      */
     public function build(
-        QueryBuilder $builder,
+        QueryBuilderInterface $builder,
         TableCollection $tables,
         TableCollection $usedTables,
         FieldCollection $fields

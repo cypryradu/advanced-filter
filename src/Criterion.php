@@ -2,7 +2,7 @@
 
 namespace CypryRadu\AdvancedFilter;
 
-use Doctrine\DBAL\Query\QueryBuilder;
+use CypryRadu\AdvancedFilter\QueryBuilder\QueryBuilderInterface;
 use CypryRadu\AdvancedFilter\ValueObject\DateVO;
 use CypryRadu\AdvancedFilter\ValueObject\FieldVO;
 use CypryRadu\AdvancedFilter\ValueObject\TableVO;
@@ -115,13 +115,13 @@ class Criterion
     /**
      * Adds the FROM clause.
      *
-     * @param \Doctrine\DBAL\Query\QueryBuilder             $builder
-     * @param \CypryRadu\AdvancedFilter\ValueObject\TableVO $fromTable
-     * @param \CypryRadu\AdvancedFilter\ValueObject\TableVO $fromTable
+     * @param \CypryRadu\AdvancedFilter\QueryBuilder\QueryBuilderInterface $builder
+     * @param \CypryRadu\AdvancedFilter\ValueObject\TableVO                $fromTable
+     * @param \CypryRadu\AdvancedFilter\ValueObject\TableVO                $fromTable
      *
      * @return bool TRUE only the first time when the FROM clause is added, FALSE otherwise
      */
-    private function buildFrom(QueryBuilder $builder, TableVO $fromTable, TableCollection $tablesUsed)
+    private function buildFrom(QueryBuilderInterface $builder, TableVO $fromTable, TableCollection $tablesUsed)
     {
         $doesBuildFrom = false;
         $fromTableName = $fromTable->getName();
@@ -145,14 +145,14 @@ class Criterion
     /*
      * Adds the necessary joins for this field
      *
-     * @param \Doctrine\DBAL\Query\QueryBuilder $builder
+     * @param \CypryRadu\AdvancedFilter\QueryBuilder\QueryBuilderInterface $builder
      * @param \CypryRadu\AdvancedFilter\ValueObject\FieldVO $field
      * @param \CypryRadu\AdvancedFilter\ValueObject\TableCollection $tables
      * @param \CypryRadu\AdvancedFilter\ValueObject\TableCollection $tablesUsed
      *
      * @return integer How many tables were used so far
     */
-    private function buildJoins(QueryBuilder $builder, FieldVO $field, TableCollection $tables, TableCollection $tablesUsed)
+    private function buildJoins(QueryBuilderInterface $builder, FieldVO $field, TableCollection $tables, TableCollection $tablesUsed)
     {
         $tablesUsedCount = $tablesUsed->count();
         $fromTable = $tables->first();
@@ -186,10 +186,10 @@ class Criterion
     /**
      * Builds the WHERE clause.
      *
-     * @param \Doctrine\DBAL\Query\QueryBuilder             $builder
-     * @param \CypryRadu\AdvancedFilter\ValueObject\FieldVO $field
+     * @param \CypryRadu\AdvancedFilter\QueryBuilder\QueryBuilderInterface $builder
+     * @param \CypryRadu\AdvancedFilter\ValueObject\FieldVO                $field
      */
-    private function buildWhere(QueryBuilder $builder, FieldVO $field)
+    private function buildWhere(QueryBuilderInterface $builder, FieldVO $field)
     {
         $openParens = str_repeat('(', $this->calculateNumberOfParens($this->openParens));
         $closedParens = str_repeat(')', $this->calculateNumberOfParens($this->closedParens));
@@ -228,15 +228,15 @@ class Criterion
      * Builds the QueryBuilder for individual Criterion(s)
      * It propagates from Criteria collection object.
      *
-     * @param \Doctrine\DBAL\Query\QueryBuilder         $builder
-     * @param \CypryRadu\AdvancedFilter\TableCollection $tables
-     * @param \CypryRadu\AdvancedFilter\TableCollection $tablesUsed
-     * @param \CypryRadu\AdvancedFilter\FieldCollection $fields
+     * @param \CypryRadu\AdvancedFilter\QueryBuilder\QueryBuilderInterface $builder
+     * @param \CypryRadu\AdvancedFilter\TableCollection                    $tables
+     * @param \CypryRadu\AdvancedFilter\TableCollection                    $tablesUsed
+     * @param \CypryRadu\AdvancedFilter\FieldCollection                    $fields
      *
      * @throws InvalidArgumentException If the given field name cannot be find
      *                                  in the Config->fields() array
      */
-    public function build(QueryBuilder $builder, TableCollection $tables, TableCollection $tablesUsed, FieldCollection $fields)
+    public function build(QueryBuilderInterface $builder, TableCollection $tables, TableCollection $tablesUsed, FieldCollection $fields)
     {
         $fromTable = $tables->first();
         $field = $fields->get($this->fieldName);

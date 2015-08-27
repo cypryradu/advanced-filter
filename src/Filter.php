@@ -2,7 +2,7 @@
 
 namespace CypryRadu\AdvancedFilter;
 
-use Doctrine\DBAL\Query\QueryBuilder;
+use CypryRadu\AdvancedFilter\QueryBuilder\QueryBuilderInterface;
 use CypryRadu\AdvancedFilter\ValueObject\TableVO;
 use CypryRadu\AdvancedFilter\ValueObject\FieldVO;
 
@@ -22,7 +22,7 @@ class Filter
      */
     private $criteria;
     /**
-     * @var \Doctrine\DBAL\Query\QueryBuilder
+     * @var \CypryRadu\AdvancedFilter\QueryBuilder\QueryBuilderInterface
      */
     private $builder;
     /**
@@ -33,10 +33,10 @@ class Filter
     /**
      * Constructor.
      *
-     * @param \Doctrine\DBAL\Query\QueryBuilder $builder
-     * @param \CypryRadu\AdvancedFilter\Config  $config
+     * @param \CypryRadu\AdvancedFilter\QueryBuilder\QueryBuilderInterface $builder
+     * @param \CypryRadu\AdvancedFilter\Config                             $config
      */
-    public function __construct(QueryBuilder $builder, Config $config)
+    public function __construct(QueryBuilderInterface $builder, Config $config)
     {
         $this->builder = $builder;
         $this->config = $config;
@@ -117,7 +117,7 @@ class Filter
     /**
      * Builds the QueryBuilder based on the information in the Config and Criteria.
      *
-     * @return Doctrine\DBAL\Query\QueryBuilder
+     * @return \CypryRadu\AdvancedFilter\QueryBuilder\QueryBuilderInterface
      */
     public function build()
     {
