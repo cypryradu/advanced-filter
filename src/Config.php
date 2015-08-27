@@ -34,13 +34,13 @@ class Config implements FilterConfigInterface
     public function tables()
     {
         return array(
-            'mv.marketing__volunteers' => array(),
-            'l.log' => array('leftJoin', 'l.id = mv.log_id'),
-            'ro.recruitment_offices' => array('leftJoin', 'ro.id = mv.recruitment_office_id'),
-            'mvdr.marketing__volunteers_destinations_rel' => array('leftJoin', 'mvdr.vol_id = mv.id'),
-            'mvpr.marketing__volunteers_projects_rel' => array(
+            'c.clients' => array(),
+            'l.log' => array('leftJoin', 'l.id = c.log_id'),
+            'o.offices' => array('leftJoin', 'o.id = c.office_id'),
+            'ord.orders' => array('leftJoin', 'ord.client_id = c.id'),
+            'p.products' => array(
                 'leftJoin',
-                'mvpr.vol_id = mv.id AND mvpr.destination_id = mvdr.destination_id AND mvpr.destination_order = mvdr.destination_order',
+                'p.id = ord.product_id'
             ),
         );
     }
@@ -54,23 +54,23 @@ class Config implements FilterConfigInterface
     {
         return array(
             'firstname' => array(
-                'table_alias' => 'mv',
+                'table_alias' => 'c',
                 'use_tables' => array(
-                    'mv.marketing__volunteers',
+                    'c.clients',
                 ),
             ),
-            'volunteer_surname' => array(
-                'table_alias' => 'mv',
+            'client_surname' => array(
+                'table_alias' => 'c',
                 'db_field' => 'surname',
                 'use_tables' => array(
-                    'mv.marketing__volunteers',
+                    'c.clients',
                 ),
             ),
-            'recruitment_office' => array(
-                'table_alias' => 'ro',
+            'office' => array(
+                'table_alias' => 'o',
                 'use_tables' => array(
-                    'mv.marketing__volunteers',
-                    'ro.recruitment_offices',
+                    'c.clients',
+                    'o.offices',
                 ),
             ),
             'application_date' => array(
@@ -79,8 +79,14 @@ class Config implements FilterConfigInterface
                 'type' => 'date',
                 'operators' => array('>=', '<=', 'LIKE', 'NOT LIKE'),
                 'use_tables' => array(
-                    'mv.marketing__volunteers',
+                    'c.clients',
                     'l.log',
+                ),
+            ),
+            'invalid_table_field' => array(
+                'table_alias' => 'inv',
+                'use_tables' => array(
+                    'inv.no_table'
                 ),
             ),
         );

@@ -14,4 +14,6 @@ interface QueryBuilderInterface
     public function where($predicates); // sets WHERE clause, replaces any previously defined WHERE conditions
     public function andWhere($where); // adds an OR condition to the WHERE clause
     public function orWhere($where); // adds an OR condition to the WHERE clause
+    public function createPositionalParameter($value, $type = \PDO::PARAM_STR);
+    public function getOriginal(); // get the original query builder behind
 }

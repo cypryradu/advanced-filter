@@ -33,7 +33,7 @@ class FilterTest extends PHPUnit_Framework_TestCase
     /**
      * @expectedException InvalidArgumentException
      */
-    public function testExceptionWhenNotFieldNotDefined()
+    public function testExceptionWhenFieldNotDefined()
     {
         $queryBuilder = $this->createQueryBuilder();
 
@@ -41,7 +41,27 @@ class FilterTest extends PHPUnit_Framework_TestCase
 
         $advancedFilter = new Filter($queryBuilder, $filterConfig);
         $advancedFilter->addWhere(new Criterion(array(
-            'field' => 'volunteer_firstname', // this is not defined
+            'field' => 'client_firstname', // this is not defined
+            'operator' => '=',
+            'value' => 'Ciprian',
+            'link' => ''
+        )));
+        $builder = $advancedFilter->build();
+    }
+
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testExceptionWhenTableNotDefined()
+    {
+        $queryBuilder = $this->createQueryBuilder();
+
+        $filterConfig = new Config();
+
+        $advancedFilter = new Filter($queryBuilder, $filterConfig);
+        $advancedFilter->addWhere(new Criterion(array(
+            'field' => 'invalid_table_field', // this is not defined
             'operator' => '=',
             'value' => 'Ciprian',
             'link' => '',
@@ -53,8 +73,8 @@ class FilterTest extends PHPUnit_Framework_TestCase
     {
         $testQueryBuilder = $this->createQueryBuilder();
         $testQueryBuilder->select('*')
-            ->from('marketing__volunteers', 'mv')
-            ->where('mv.`firstname` = '.$testQueryBuilder->createPositionalParameter('Ciprian'))
+            ->from('clients', 'c') 
+            ->where('c.`firstname` = ' . $testQueryBuilder->createPositionalParameter('Ciprian'))
         ;
         $queryBuilder = $this->createQueryBuilder();
 
@@ -76,8 +96,8 @@ class FilterTest extends PHPUnit_Framework_TestCase
     {
         $testQueryBuilder = $this->createQueryBuilder();
         $testQueryBuilder->select('*')
-            ->from('marketing__volunteers', 'mv')
-            ->where('mv.`surname` = '.$testQueryBuilder->createPositionalParameter('Radu'))
+            ->from('clients', 'c') 
+            ->where('c.`surname` = ' . $testQueryBuilder->createPositionalParameter('Radu'))
         ;
         $queryBuilder = $this->createQueryBuilder();
 
@@ -87,7 +107,7 @@ class FilterTest extends PHPUnit_Framework_TestCase
         $advancedFilter->addWhere(new Criterion(array(
             'open_parens' => array(0, 0),
             'closed_parens' => array(0, 0),
-            'field' => 'volunteer_surname',
+            'field' => 'client_surname',
             'operator' => '=',
             'value' => 'Radu',
         )));
@@ -99,8 +119,8 @@ class FilterTest extends PHPUnit_Framework_TestCase
     {
         $testQueryBuilder = $this->createQueryBuilder();
         $testQueryBuilder->select('*')
-            ->from('marketing__volunteers', 'mv')
-            ->where('(mv.`firstname` = '.$testQueryBuilder->createPositionalParameter('Ciprian').')')
+            ->from('clients', 'c') 
+            ->where('(c.`firstname` = ' . $testQueryBuilder->createPositionalParameter('Ciprian') . ')')
         ;
         $queryBuilder = $this->createQueryBuilder();
 
@@ -122,9 +142,9 @@ class FilterTest extends PHPUnit_Framework_TestCase
     {
         $testQueryBuilder = $this->createQueryBuilder();
         $testQueryBuilder->select('*')
-            ->from('marketing__volunteers', 'mv')
-            ->where('mv.`firstname` = '.$testQueryBuilder->createPositionalParameter('Ciprian'))
-            ->andWhere('mv.`surname` = '.$testQueryBuilder->createPositionalParameter('Radu'))
+            ->from('clients', 'c') 
+            ->where('c.`firstname` = ' . $testQueryBuilder->createPositionalParameter('Ciprian'))
+            ->andWhere('c.`surname` = ' . $testQueryBuilder->createPositionalParameter('Radu'))
         ;
         $queryBuilder = $this->createQueryBuilder();
 
@@ -137,7 +157,7 @@ class FilterTest extends PHPUnit_Framework_TestCase
             'value' => 'Ciprian',
         )));
         $advancedFilter->addWhere(new Criterion(array(
-            'field' => 'volunteer_surname',
+            'field' => 'client_surname',
             'operator' => '=',
             'value' => 'Radu',
             'link' => 'AND',
@@ -150,9 +170,9 @@ class FilterTest extends PHPUnit_Framework_TestCase
     {
         $testQueryBuilder = $this->createQueryBuilder();
         $testQueryBuilder->select('*')
-            ->from('marketing__volunteers', 'mv')
-            ->where('(mv.`firstname` = '.$testQueryBuilder->createPositionalParameter('Ciprian'))
-            ->orWhere('mv.`surname` = '.$testQueryBuilder->createPositionalParameter('Radu').')')
+            ->from('clients', 'c') 
+            ->where('(c.`firstname` = ' . $testQueryBuilder->createPositionalParameter('Ciprian'))
+            ->orWhere('c.`surname` = ' . $testQueryBuilder->createPositionalParameter('Radu') . ')')
         ;
         $queryBuilder = $this->createQueryBuilder();
 
@@ -167,9 +187,9 @@ class FilterTest extends PHPUnit_Framework_TestCase
             'value' => 'Ciprian',
         )));
         $advancedFilter->addWhere(new Criterion(array(
-            'open_parens' => array(0, 0),
-            'closed_parens' => array(1, 0),
-            'field' => 'volunteer_surname',
+            'open_parens' => array(0,0),
+            'closed_parens' => array(1,0),
+            'field' => 'client_surname',
             'operator' => '=',
             'value' => 'Radu',
             'link' => 'OR',
@@ -182,9 +202,9 @@ class FilterTest extends PHPUnit_Framework_TestCase
     {
         $testQueryBuilder = $this->createQueryBuilder();
         $testQueryBuilder->select('*')
-            ->from('marketing__volunteers', 'mv')
-            ->leftJoin('mv', 'recruitment_offices', 'ro', 'ro.id = mv.recruitment_office_id')
-            ->where('ro.`recruitment_office` = '.$testQueryBuilder->createPositionalParameter('France'))
+            ->from('clients', 'c') 
+            ->leftJoin('c', 'offices', 'o', 'o.id = c.office_id') 
+            ->where('o.`office` = ' . $testQueryBuilder->createPositionalParameter('France'))
         ;
         $queryBuilder = $this->createQueryBuilder();
 
@@ -192,7 +212,7 @@ class FilterTest extends PHPUnit_Framework_TestCase
 
         $advancedFilter = new Filter($queryBuilder, $filterConfig);
         $advancedFilter->addWhere(new Criterion(array(
-            'field' => 'recruitment_office',
+            'field' => 'office',
             'operator' => '=',
             'value' => 'France',
         )));
@@ -206,10 +226,10 @@ class FilterTest extends PHPUnit_Framework_TestCase
 
         $testQueryBuilder = $this->createQueryBuilder();
         $testQueryBuilder->select('*')
-            ->from('marketing__volunteers', 'mv')
-            ->leftJoin('mv', 'log', 'l', 'l.id = mv.log_id')
-            ->where('l.`date_created` >= '.$testQueryBuilder->createPositionalParameter('2013-02-01'))
-            ->andWhere('l.`date_created` < '.$testQueryBuilder->createPositionalParameter('2013-02-21'))
+            ->from('clients', 'c') 
+            ->leftJoin('c', 'log', 'l', 'l.id = c.log_id') 
+            ->where('l.`date_created` >= ' . $testQueryBuilder->createPositionalParameter('2013-02-01'))
+            ->andWhere('l.`date_created` < ' . $testQueryBuilder->createPositionalParameter('2013-02-21'))
         ;
         $queryBuilder = $this->createQueryBuilder();
 

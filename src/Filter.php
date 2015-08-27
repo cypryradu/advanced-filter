@@ -14,7 +14,7 @@ use CypryRadu\AdvancedFilter\ValueObject\FieldVO;
 class Filter
 {
     /**
-     * @var \CypryRadu\AdvancedFilter\Config
+     * @var \CypryRadu\AdvancedFilter\FilterConfigInterface
      */
     private $config;
     /**
@@ -34,9 +34,9 @@ class Filter
      * Constructor.
      *
      * @param \CypryRadu\AdvancedFilter\QueryBuilder\QueryBuilderInterface $builder
-     * @param \CypryRadu\AdvancedFilter\Config                             $config
+     * @param \CypryRadu\AdvancedFilter\FilterConfigInterface $config
      */
-    public function __construct(QueryBuilderInterface $builder, Config $config)
+    public function __construct(QueryBuilderInterface $builder, FilterConfigInterface $config)
     {
         $this->builder = $builder;
         $this->config = $config;

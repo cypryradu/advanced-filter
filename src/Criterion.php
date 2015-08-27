@@ -151,6 +151,8 @@ class Criterion
      * @param \CypryRadu\AdvancedFilter\ValueObject\TableCollection $tablesUsed
      *
      * @return integer How many tables were used so far
+     * @throws InvalidArgumentException If the given table name cannot be find
+     *                                  in the Config->tables() array
     */
     private function buildJoins(QueryBuilderInterface $builder, FieldVO $field, TableCollection $tables, TableCollection $tablesUsed)
     {
@@ -165,6 +167,10 @@ class Criterion
                 }
 
                 $table = $tables->get($tableKey);
+
+                if (!$table) {
+                    throw new \InvalidArgumentException('There is no table defined as "'.$tableKey.'"');
+                }
 
                 $tableName = $table->getName();
                 $tableAlias = $table->getAlias();
