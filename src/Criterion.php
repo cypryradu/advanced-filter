@@ -137,9 +137,59 @@ class Criterion
         return $doesBuildFrom;
     }
 
-    private function buildSelect($builder)
-    {
-        $builder->select('*');
+    /**
+     * Adds the SELECT columns
+     * 
+     * @param \CypryRadu\AdvancedFilter\QueryBuilder\QueryBuilderInterface $builder 
+     * @param \CypryRadu\AdvancedFilter\FieldCollection                    $fields
+     * @param \CypryRadu\AdvancedFilter\ValueObject\TableCollection $tables
+     * @param \CypryRadu\AdvancedFilter\ValueObject\TableCollection $tablesUsed
+     * @param array $columns 
+     */
+    private function buildSelect(
+        QueryBuilderInterface $builder,
+        FieldCollection $fields,
+        TableCollection $tables,
+        TableCollection $tablesUsed,
+        array $columns
+    ) {
+        $builder->select('');
+
+        // if there are no columns defined except the default one
+        if (count($columns) == 1 && $columns[0] == '*') {
+            $builder->select('*');
+            return;
+        }
+
+        foreach ($columns as $key => $col) {
+            $fieldName = $col;
+            $hasColumnAlias = false;
+
+            if (is_string($key)) {
+                $fieldName = $key;
+                $hasColumnAlias = true;
+            }
+
+            $field = $fields->get($fieldName);
+
+            if ($field) {
+                $tableAlias = $field->getTableAlias();
+
+                if ($field->getColumnExpr()) {
+                    $fieldName = $field->getColumnExpr();
+                } else {
+                    $fieldName = $tableAlias . $field->getDbField();
+                }
+
+                // add the necessary join for this field
+                $this->buildJoins($builder, $field, $tables, $tablesUsed);
+            }
+
+            if ($hasColumnAlias) {
+                $fieldName = $fieldName . " AS '" . $col . "'";
+            }
+            $builder->addSelect($fieldName);
+        }
     }
 
     /*
@@ -238,12 +288,18 @@ class Criterion
      * @param \CypryRadu\AdvancedFilter\TableCollection                    $tables
      * @param \CypryRadu\AdvancedFilter\TableCollection                    $tablesUsed
      * @param \CypryRadu\AdvancedFilter\FieldCollection                    $fields
+     * @param array                                                        $columns
      *
      * @throws InvalidArgumentException If the given field name cannot be find
      *                                  in the Config->fields() array
      */
-    public function build(QueryBuilderInterface $builder, TableCollection $tables, TableCollection $tablesUsed, FieldCollection $fields)
-    {
+    public function build(
+        QueryBuilderInterface $builder,
+        TableCollection $tables,
+        TableCollection $tablesUsed,
+        FieldCollection $fields,
+        array $columns
+    ) {
         $fromTable = $tables->first();
         $field = $fields->get($this->fieldName);
 
@@ -253,7 +309,7 @@ class Criterion
 
         $doesBuildFrom = $this->buildFrom($builder, $fromTable, $tablesUsed);
         if ($doesBuildFrom) {
-            $this->buildSelect($builder);
+            $this->buildSelect($builder, $fields, $tables, $tablesUsed, $columns);
         }
         $this->buildJoins($builder, $field, $tables, $tablesUsed);
         $this->buildWhere($builder, $field);

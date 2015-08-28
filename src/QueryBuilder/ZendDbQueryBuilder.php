@@ -28,9 +28,22 @@ class ZendDbQueryBuilder implements QueryBuilderInterface
 
     public function select($select = null)
     {
+        $this->select->reset('columns');
         $this->select->columns($select);
 
         return $this;
+    }
+
+    public function addSelect($selectFieldExpr)
+    {
+        list($fieldExpr, $alias) = explode(' AS ');
+
+        if (!empty($alias)) {
+            $alias = trim($alias, "'");
+            $this->select->columns(array($alias => $fieldExpr));
+        } else {
+            $this->select->columns(array($fieldExpr));
+        }
     }
 
     public function join($fromAlias, $join, $alias, $condition = null)
@@ -106,6 +119,8 @@ class ZendDbQueryBuilder implements QueryBuilderInterface
     public function createPositionalParameter($value, $type = \PDO::PARAM_STR)
     {
         $this->positionalParams[] = $value;
+
+        return '?';
     }
 
     public function getOriginal()

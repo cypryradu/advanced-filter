@@ -99,4 +99,14 @@ class FieldVO
     {
         return (!empty($this->metaData['type']) ? $this->metaData['type'] : '');
     }
+
+    /**
+     * Gets the field's table type.
+     *
+     * @return string
+     */
+    public function getColumnExpr()
+    {
+        return (!empty($this->metaData['column_expr']) ? $this->metaData['column_expr'] : '');
+    }
 }

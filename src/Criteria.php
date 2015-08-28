@@ -34,15 +34,17 @@ class Criteria
      * @param \CypryRadu\AdvancedFilter\TableCollection                    $tables
      * @param \CypryRadu\AdvancedFilter\TableCollection                    $usedTables
      * @param \CypryRadu\AdvancedFilter\FieldCollection                    $fields
+     * @param array                                                        $columns
      */
     public function build(
         QueryBuilderInterface $builder,
         TableCollection $tables,
         TableCollection $usedTables,
-        FieldCollection $fields
+        FieldCollection $fields,
+        array $columns
     ) {
         foreach ($this->criteria as $criterion) {
-            $criterion->build($builder, $tables, $usedTables, $fields);
+            $criterion->build($builder, $tables, $usedTables, $fields, $columns);
         }
     }
 }

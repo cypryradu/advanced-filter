@@ -6,7 +6,8 @@ interface QueryBuilderInterface
 {
     public function getSql(); // converts the builder to SQL statement
     public function from($from, $alias); // sets the FROM clause
-    public function select($select = null); // SELECT fields
+    public function select($select = null); // SELECT fields resetting all previous ones
+    public function addSelect($selectFieldExpr); // add more SELECT fields
     public function join($fromAlias, $join, $alias, $condition = null); // adds a JOIN
     public function innerJoin($fromAlias, $join, $alias, $condition = null); // adds an INNER JOIN
     public function leftJoin($fromAlias, $join, $alias, $condition = null); // adds a LEFT JOIN

@@ -36,6 +36,7 @@ class Config implements FilterConfigInterface
         return array(
             'c.clients' => array(),
             'l.log' => array('leftJoin', 'l.id = c.log_id'),
+            'e.emails' => array('leftJoin', 'e.client_id = c.id'),
             'o.offices' => array('leftJoin', 'o.id = c.office_id'),
             'ord.orders' => array('leftJoin', 'ord.client_id = c.id'),
             'p.products' => array(
@@ -73,6 +74,13 @@ class Config implements FilterConfigInterface
                     'o.offices',
                 ),
             ),
+            'emails' => array(
+                'column_expr' => 'GROUP_CONCAT(e.email)',
+                'use_tables' => array(
+                    'c.clients',
+                    'e.emails',
+                ),
+            ),
             'application_date' => array(
                 'table_alias' => 'l',
                 'db_field' => 'date_created',
@@ -89,6 +97,15 @@ class Config implements FilterConfigInterface
                     'inv.no_table'
                 ),
             ),
+        );
+    }
+
+    public function columns()
+    {
+        return array(
+            'firstname' => 'First Name',
+            'client_surname' => 'Last Name',
+            'office' => 'Office'
         );
     }
 
