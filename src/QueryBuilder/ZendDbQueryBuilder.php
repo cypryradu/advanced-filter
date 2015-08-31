@@ -36,7 +36,7 @@ class ZendDbQueryBuilder implements QueryBuilderInterface
 
     public function addSelect($selectFieldExpr)
     {
-        list($fieldExpr, $alias) = explode(' AS ');
+        list($fieldExpr, $alias) = explode(' AS ', $selectFieldExpr);
 
         if (!empty($alias)) {
             $alias = trim($alias, "'");
